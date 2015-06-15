@@ -79,6 +79,19 @@ class BaseElement extends Widget {
 			}
 		}
 
+		/* --------------------- */
+		//      History
+		/* --------------------- */
+
+		// return actual DataList of $Classname objects
+		$versions = Versioned::get_all_versions($this->Classname, $this->ID);
+		// return ArrayList of Versioned_Version object
+		// $versions = $this->Versions(); 
+
+		$fields->addFieldToTab('Root.History',
+			new GridField('History', 'History', $elements, GridfieldConfig_RecordViewer::create())
+		);
+
 		$this->extend('updateCMSFields', $fields);
 
 		return $fields;
