@@ -66,7 +66,7 @@ class BaseElement extends Widget
     /**
      * @var boolean
      */
-    private static $enable_title_in_template = false;
+    private static $enable_title_in_template = true;
 
 	/**
      * @var array
