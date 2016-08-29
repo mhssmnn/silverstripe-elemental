@@ -14,9 +14,20 @@ class ElementChildrenList extends BaseElement
         'ParentPage' => 'SiteTree'
     );
 
-    private static $title = "Show a list of pages in a list.";
+    private static $title = "Show a list of pages";
 
     private static $enable_title_in_template = true;
+
+    public function getCMSFields()
+    {
+        $this->beforeUpdateCMSFields(function ($fields) {
+            $fields->addFieldsToTab('Root.Main', array(
+                TreeDropdownField::create('ParentPageID', 'Parent page', 'SiteTree')
+            ));
+        });
+
+        return parent::getCMSFields();
+    }
 
     public function getChildrenList()
     {

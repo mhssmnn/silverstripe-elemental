@@ -7,11 +7,8 @@ class ElementContent extends BaseElement
 {
 
     private static $db = array(
-        'HTML' => 'HTMLText',
-        'Style' => 'Varchar'
+        'HTML' => 'HTMLText'
     );
-
-    private static $styles = array();
 
     private static $title = "Content Block";
 
@@ -19,21 +16,6 @@ class ElementContent extends BaseElement
 
     public function getCMSFields()
     {
-        $styles = $this->config()->get('styles');
-
-        if (count($styles) > 0) {
-            $this->beforeUpdateCMSFields(function ($fields) use ($styles) {
-                $fields->addFieldsToTab('Root.Main', new HtmlEditorField('HTML', 'Content'));
-                $fields->addFieldsToTab('Root.Main', $styles = new DropdownField('Style', 'Style', $styles));
-
-                $styles->setEmptyString('Select a custom style..');
-            });
-        } else {
-            $this->beforeUpdateCMSFields(function ($fields) {
-                $fields->removeByName('Style');
-            });
-        }
-
         $fields = parent::getCMSFields();
 
         if ($this->isEndofLine('ElementContent') && $this->hasExtension('VersionViewerDataObject')) {
@@ -41,15 +23,5 @@ class ElementContent extends BaseElement
         }
 
         return $fields;
-    }
-
-    public function getCssStyle()
-    {
-        $styles = $this->config()->get('styles');
-        $style = $this->Style;
-
-        if (isset($styles[$style])) {
-            return strtolower($styles[$style]);
-        }
     }
 }

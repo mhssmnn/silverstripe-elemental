@@ -10,7 +10,8 @@ class BaseElement extends Widget
      */
     private static $db = array(
         'ExtraClass' => 'Varchar(255)',
-        'HideTitle' => 'Boolean'
+        'HideTitle' => 'Boolean',
+        'Style' => 'Varchar'
     );
 
     /**
@@ -29,13 +30,13 @@ class BaseElement extends Widget
 
     /**
      * @var string
-     */
-    private static $title = "Content Block";
+    */
+    private static $title = "Base Element";
 
     /**
      * @var string
      */
-    private static $singular_name = 'Content Block';
+    private static $singular_name = 'Base Element';
 
     /**
      * @var array
@@ -57,10 +58,20 @@ class BaseElement extends Widget
         'LastEdited'
     );
 
+	/**
+     * @var string
+     */
+    private static $description = "Base class for elements";
+
     /**
      * @var boolean
      */
     private static $enable_title_in_template = false;
+
+	/**
+     * @var array
+     */
+    private static $styles = array();
 
 
     public function getCMSFields()
@@ -84,6 +95,14 @@ class BaseElement extends Widget
             if ($title) {
                 $title->setRightTitle('For reference only. Does not appear in the template.');
             }
+        }
+
+        if ($styles = $this->config()->get('styles')) {
+            $fields->addFieldsToTab('Root.Main', $styles = new DropdownField('Style', 'Style', $styles));
+
+            $styles->setEmptyString('Select a custom style..');
+        } else {
+            $fields->removeByName('Style');
         }
 
         $fields->addFieldToTab('Root.Settings', new TextField('ExtraClass', 'Extra CSS Classes to add'));
@@ -238,15 +257,51 @@ class BaseElement extends Widget
         return null;
     }
 
+    public function getCssStyle()
+    {
+        $styles = $this->config()->get('styles');
+        $style = $this->Style;
+
+        if (isset($styles[$style])) {
+            return strtolower($styles[$style]);
+        }
+    }
+
     /**
-     * Override the {@link Widget::forTemplate()} method so that holders are not rendered twice. The controller should
-     * render with widget inside the
+     * Override the {@link Widget::forTemplate()} method so that holders are not
+     * rendered twice. The controller should render with widget inside the
      *
      * @return HTML
      */
-    public function forTemplate($holder = true)
-    {
-        return $this->renderWith($this->class);
+    public function forTemplate($holder = true) {
+        return parent::forTemplate($holder = false);
+    }
+
+    /**
+     * Override the {@link Widget::Content()} method which is called from
+     * `forTemplate()`. Here we gather templates from the `$template` property.
+     *
+     * @return HTML
+     */
+    public function Content() {
+        return $this->renderWith($this->getCandidateTemplates());
+    }
+
+    /**
+     * Note: Can be overloaded in subclasses to specify additional
+     * template options.
+     *
+     * @return array Array of candidate templates
+     */
+    public function getCandidateTemplates($templates = array()) {
+        if ($this->Style) {
+            $style = $this->class . "_{$this->Style}";
+            array_push($templates, $style);
+        }
+
+        array_push($templates, $this->class);
+
+        return $templates;
     }
 
     /**

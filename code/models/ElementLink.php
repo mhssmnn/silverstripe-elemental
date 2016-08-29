@@ -38,4 +38,9 @@ class ElementLink extends BaseElement
 
         return parent::getCMSFields();
     }
+
+    public function getIsModalLink()
+    {
+        return preg_match('/^#.*Modal$/', $this->owner->LinkURL);
+    }
 }
