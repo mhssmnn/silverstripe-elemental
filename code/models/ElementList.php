@@ -37,8 +37,9 @@ class ElementList extends BaseElement
     {
         $elements = $this->Elements();
         $isInDb = $this->isInDB();
+        $that = $this;
 
-        $this->beforeUpdateCMSFields(function ($fields) use ($elements, $isInDb) {
+        $this->beforeUpdateCMSFields(function ($fields) use ($elements, $isInDb, $that) {
             $fields->removeByName('Root.Elements');
             $fields->removeByName('Elements');
 
@@ -50,7 +51,7 @@ class ElementList extends BaseElement
             if ($isInDb) {
                 $adder = new ElementalGridFieldAddNewMultiClass();
 
-                $list = $this->getAvailableTypes();
+                $list = $that->getAvailableTypes();
 
                 if($list) {
                     $adder->setClasses($list);
